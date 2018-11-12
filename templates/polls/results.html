@@ -1,0 +1,90 @@
+{% load static %}
+
+<link rel="stylesheet" type="text/css" href="{% static 'polls/style.css' %}">
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Results</title>
+
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css">
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
+    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js"></script>
+
+</head>
+<body>
+
+
+    <h1>{{ question.question_text }}</h1>
+
+
+    <table class="table" id="choice_table">
+    <thead>
+      <tr>
+        <th>Choice:</th>
+        <th>Votes:</th>
+        {% for choice in question.choice_set.all %}
+            <tr>
+                <td>{{ choice.choice_text }}</td>
+                <td>{{ choice.votes }} vote{{ choice.votes|pluralize }}</td>
+            </tr>
+        {% endfor %}
+      </tr>
+    </thead>
+    </table>
+
+    <a href="{%  url 'polls:detail' question.id %}">Vote again?</a>
+    <br>
+    <a href="{%  url 'polls:polls' %}">Back to polls</a>
+
+
+    <div id="piechart"></div>
+
+    <script type="text/javascript" src="https://www.gstatic.com/charts/loader.js"></script>
+
+    <script type="text/javascript">
+    // Load google charts
+    google.charts.load('current', {'packages':['corechart']});
+    google.charts.setOnLoadCallback(drawChart);
+
+
+    // Draw the chart and set the chart values
+    function drawChart() {
+        var temp_data = []
+        var table = document.getElementById("choice_table");
+        for (var i = 1, row; row = table.rows[i]; i++) {
+            temp = []
+            for (var j = 0, col; col = row.cells[j]; j++) {
+                var val
+                if(j==1 && i!=0){
+                    val = col.innerHTML
+                    val = val.charAt(0)
+                    val = parseInt(val)
+                }else{
+                    val=col.innerHTML
+                }
+                temp.push(val)
+            }
+            temp_data.push(temp)
+
+        }
+        var google_data = new google.visualization.DataTable();
+        google_data.addColumn('string', 'Choice');
+        google_data.addColumn('number', 'Answers')
+        for (var i = 0; i < temp_data.length; i++){
+            google_data.addRow([temp_data[i][0], temp_data[i][1]])
+        }
+        console.log(temp_data)
+
+        // Optional; add a title and set the width and height of the chart
+        var options = {'width': 550, 'height': 400};
+
+        // Display the chart inside the <div> element with id="piechart"
+        var chart = new google.visualization.PieChart(document.getElementById('piechart'));
+        chart.draw(google_data, options);
+    }
+    </script>
+</body>
+</html>
