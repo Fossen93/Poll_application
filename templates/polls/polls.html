@@ -31,6 +31,7 @@
                     <th>Question:</th>
                     <th>Published:</th>
                     <th>Answer:</th>
+                    <th>Results:</th>
                 </tr>
             </thead>
             <tbody>
@@ -40,6 +41,9 @@
                     <td>{{ question.pub_date }}</td>
                     <form action="{% url 'polls:detail' question.id %}">
                         <td><input type="submit" value="Answer" class="btn btn-warning btn-sm"></td>
+                    </form>
+                    <form action="{% url 'polls:results' question.id %}">
+                        <td><input type="submit" value="Results" class="btn btn-warning btn-sm"></td>
                     </form>
                 </tr>
             {% endfor %}
